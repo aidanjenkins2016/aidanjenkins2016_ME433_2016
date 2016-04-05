@@ -50,7 +50,8 @@
 
 /*Config setup using the IDE tools*/
 #include <xc.h>
-#include<sys/attribs.h>  // __ISR macro
+#include <sys/attribs.h>  // __ISR macro
+
 
 // DEVCFG3
 #pragma config USERID = 0 //No Setting
@@ -104,24 +105,33 @@ int main() {
     DDPCONbits.JTAGEN = 0;
     
     // do your TRIS and LAT commands here
+   TRISBbits.TRISB4 = 1; // pin 12 as an output
+   TRISAbits.TRISA4 = 0; //pin 11 as an input
+   LATAbits.LATA4 = 0; //set pin 12 
+       
     
     __builtin_enable_interrupts();
     
+   
     _CP0_SET_COUNT(0);
+    
     while(1) {
 	    // use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
 		// remember the core timer runs at half the CPU speed
         
-        if (_CP0_GET_COUNT() >= 12000){
-            LATAbits.LATA4^=1; //toggle
-            _CP0_SET_COUNT(0);
+        if (PORTBbits.RB4==0) {          
+            if (_CP0_GET_COUNT() >= 12000){
+                LATAbits.LATA4= ~LATAbits.LATA4; //toggle
+                _CP0_SET_COUNT(0);
+            }
+            else {
+            //do nothing
+            }
+    
         }
         else {
-        //do nothing
+            LATAbits.LATA4=0;//no button then LED off
         }
     }
-    
-  
-    
-    
-}
+        
+    }
