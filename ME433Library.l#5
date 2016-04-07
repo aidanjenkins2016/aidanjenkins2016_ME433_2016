@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.025" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
@@ -93,70 +93,42 @@
 <wire x1="3.81" y1="0" x2="5.08" y2="1.27" width="0.127" layer="21" curve="90"/>
 <wire x1="5.08" y1="1.27" x2="6.35" y2="1.27" width="0.127" layer="21"/>
 <wire x1="6.35" y1="1.27" x2="6.35" y2="-34.29" width="0.127" layer="21"/>
-<text x="5.08" y="-24.13" size="1.27" layer="21" rot="R90">&gt;PIC32MX250F128B</text>
 </package>
 </packages>
 <symbols>
 <symbol name="PIC32MX250F128B">
-<pin name="MCLR" x="-60.96" y="10.16" length="middle"/>
-<pin name="PGED3/VREF+/CVREF+/AN0/C3INC/RPA0/CTED1/PMD7/RA0" x="-60.96" y="7.62" length="middle"/>
-<pin name="PGEC3/VREF-/CVREF-/AN1/RPA1/CTED2/PMD6/RA1" x="-60.96" y="5.08" length="middle"/>
-<pin name="PGED1/AN2/C1IND/C2INB/C3IND/RPB0/PMD0/RB0" x="-60.96" y="2.54" length="middle"/>
-<pin name="PGEC1/AN3/C1INC/C2INA/RPB1/CTED12/PMD1/RB1" x="-60.96" y="0" length="middle"/>
-<pin name="AN4/C1INB/C2IND/RPB2/SDA2/CTED13/RB2" x="-60.96" y="-2.54" length="middle"/>
-<pin name="AN5/C1INA/C2INC/RTCC/RPB3/SCL2/RB3" x="-60.96" y="-5.08" length="middle"/>
-<pin name="VSS1" x="-60.96" y="-7.62" length="middle"/>
-<pin name="OSC1/CLKI/RPA2/RA2" x="-60.96" y="-10.16" length="middle"/>
-<pin name="OSC2/CLKO/RPA3/PMA0/RA3" x="-60.96" y="-12.7" length="middle"/>
-<pin name="SOSCI/RPB4/RB4" x="-60.96" y="-15.24" length="middle"/>
-<pin name="SOSCO/RPA4/T1CK/CTED9/PMA1/RA4" x="-60.96" y="-17.78" length="middle"/>
-<pin name="VDD" x="-60.96" y="-20.32" length="middle"/>
-<pin name="TMS/RPB5/USBID/RB5" x="-60.96" y="-22.86" length="middle"/>
-<pin name="VBUS" x="53.34" y="-22.86" length="middle" rot="R180"/>
-<pin name="TDI/RPB7/CTED3/PMD5/INT0/RB7" x="53.34" y="-20.32" length="middle" rot="R180"/>
-<pin name="TCK/RPB8/SCL1/CTED10/PMD4/RB8" x="53.34" y="-17.78" length="middle" rot="R180"/>
-<pin name="TDO/RPB9/SDA1/CTED4/PMD3/RB9" x="55.88" y="-15.24" length="middle" rot="R180"/>
-<pin name="VSS2" x="53.34" y="-12.7" length="middle" rot="R180"/>
-<pin name="VCAP" x="53.34" y="-10.16" length="middle" rot="R180"/>
-<pin name="PGED2/RPB10/CTED11/PMD2/RB10" x="53.34" y="-7.62" length="middle" rot="R180"/>
-<pin name="PGEC2/TMS/RPB11/PMD1/RB11" x="53.34" y="-5.08" length="middle" rot="R180"/>
-<pin name="VUSB3V3" x="53.34" y="-2.54" length="middle" rot="R180"/>
-<pin name="AN11/RPB13/CTPLS/PMRD/RB13" x="53.34" y="0" length="middle" rot="R180"/>
-<pin name="CVREFOUT/AN10/C3INB/RPB14/SCK1/CTED5/PMWR/RB14" x="53.34" y="2.54" length="middle" rot="R180"/>
-<pin name="AN9/C3INA/RPB15/SCK2/CTED6/PMCS1/RB15" x="53.34" y="5.08" length="middle" rot="R180"/>
-<pin name="AVSS" x="53.34" y="7.62" length="middle" rot="R180"/>
-<pin name="AVDD" x="53.34" y="10.16" length="middle" rot="R180"/>
+<pin name="MCLR" x="-20.32" y="10.16" length="middle"/>
+<pin name="VREF+/CVREF+/AN0/C3INC/RPA0/CTED1/RA0" x="-20.32" y="7.62" length="middle"/>
+<pin name="VREF-/CVREF-/AN1/RPA1/CTED2/RA1" x="-20.32" y="5.08" length="middle"/>
+<pin name="PGED1/AN2/C1IND/C2INB/C3IND/RPB0/RB0" x="-20.32" y="2.54" length="middle"/>
+<pin name="PGEC1/AN3/C1INC/C2INA/RPB1/CTED12/RB1" x="-20.32" y="0" length="middle"/>
+<pin name="AN4/C1INB/C2IND/RPB2/SDA2/CTED13/RB2" x="-20.32" y="-2.54" length="middle"/>
+<pin name="AN5/C1INA/C2INC/RTCC/RPB3/SCL2/RB3" x="-20.32" y="-5.08" length="middle"/>
+<pin name="VSS" x="-20.32" y="-7.62" length="middle"/>
+<pin name="OSC1/CLKI/RPA2/RA2" x="-20.32" y="-10.16" length="middle"/>
+<pin name="OSC2/CLKO/RPA3/PMA0/RA3" x="-20.32" y="-12.7" length="middle"/>
+<pin name="SOSCI/RPB4/RB4" x="-20.32" y="-15.24" length="middle"/>
+<pin name="SOSCO/RPA4/T1CK/CTED9/PMA1/RA4" x="-20.32" y="-17.78" length="middle"/>
+<pin name="VDD" x="-20.32" y="-20.32" length="middle"/>
+<pin name="PGED3/RPB5/PMD7/RB5" x="-20.32" y="-22.86" length="middle"/>
+<pin name="PGEC3/RPB6/PMD6/RB6" x="10.16" y="-22.86" length="middle" rot="R180"/>
+<pin name="TDI/RPB7/CTED3/PMD5/INT0/RB7" x="10.16" y="-20.32" length="middle" rot="R180"/>
+<pin name="TCK/RPB8/SCL1/CTED10/PMD4/RB8" x="10.16" y="-17.78" length="middle" rot="R180"/>
+<pin name="TDO/RPB9/SDA1/CTED4/PMD3/RB9" x="10.16" y="-15.24" length="middle" rot="R180"/>
+<pin name="GND" x="10.16" y="-12.7" length="middle" rot="R180"/>
+<pin name="VCAP" x="10.16" y="-10.16" length="middle" rot="R180"/>
+<pin name="PGED2/RPB10/CTED11/PMD2/RB10" x="10.16" y="-7.62" length="middle" rot="R180"/>
+<pin name="PGEC2/TMS/RPB11/PMD1/RB11" x="10.16" y="-5.08" length="middle" rot="R180"/>
+<pin name="AN12/PMD0/RB12" x="10.16" y="-2.54" length="middle" rot="R180"/>
+<pin name="AN11/RPB13/CTPLS/PMRD/RB13" x="10.16" y="0" length="middle" rot="R180"/>
+<pin name="CVREFOUT/AN10/C3INB/RPB14/SCK1/CTED5/PMWR/RB14" x="10.16" y="2.54" length="middle" rot="R180"/>
+<pin name="AN9/C3INA/RPB15/SCK2/CTED6/PMCS1/RB15" x="10.16" y="5.08" length="middle" rot="R180"/>
+<pin name="AVSS" x="10.16" y="7.62" length="middle" rot="R180"/>
+<pin name="AVDD" x="10.16" y="10.16" length="middle" rot="R180"/>
 <text x="-20.32" y="12.7" size="1.778" layer="94">&gt;PIC32MX250F128B</text>
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="PIC32MX250F128B">
-<gates>
-<gate name="G$1" symbol="PIC32MX250F128B" x="0" y="0"/>
-</gates>
-<devices>
-<device name="" package="DIP28">
-<connects>
-<connect gate="G$1" pin="AN4/C1INB/C2IND/RPB2/SDA2/CTED13/RB2" pad="P$6"/>
-<connect gate="G$1" pin="AN5/C1INA/C2INC/RTCC/RPB3/SCL2/RB3" pad="P$7"/>
-<connect gate="G$1" pin="MCLR" pad="P$1"/>
-<connect gate="G$1" pin="OSC1/CLKI/RPA2/RA2" pad="P$9"/>
-<connect gate="G$1" pin="OSC2/CLKO/RPA3/PMA0/RA3" pad="P$10"/>
-<connect gate="G$1" pin="PGEC1/AN3/C1INC/C2INA/RPB1/CTED12/PMD1/RB1" pad="P$5"/>
-<connect gate="G$1" pin="PGED1/AN2/C1IND/C2INB/C3IND/RPB0/PMD0/RB0" pad="P$4"/>
-<connect gate="G$1" pin="SOSCI/RPB4/RB4" pad="P$11"/>
-<connect gate="G$1" pin="SOSCO/RPA4/T1CK/CTED9/PMA1/RA4" pad="P$12"/>
-<connect gate="G$1" pin="TMS/RPB5/USBID/RB5" pad="P$2"/>
-<connect gate="G$1" pin="VBUS" pad="P$3"/>
-<connect gate="G$1" pin="VDD" pad="P$13"/>
-<connect gate="G$1" pin="VSS1" pad="P$8"/>
-</connects>
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-</devices>
-</deviceset>
 </devicesets>
 </library>
 </drawing>
