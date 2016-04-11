@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.025" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
@@ -17129,6 +17129,12 @@ For boards designed to be plugged directly into a USB slot. If possible, ensure 
 <pin name="GND" x="-2.54" y="0" visible="pad" length="short"/>
 <text x="0" y="9.525" size="1.778" layer="95">&gt;NAME</text>
 <text x="0" y="-3.81" size="1.778" layer="96">&gt;VALUE</text>
+</symbol>
+<symbol name="MCP1702">
+<pin name="2.VIN" x="-15.24" y="0" length="middle"/>
+<pin name="1.GND" x="0" y="-15.24" length="middle" rot="R90"/>
+<pin name="VOU3.T" x="15.24" y="0" length="middle" rot="R180"/>
+<circle x="0" y="0" radius="11.359225" width="0.254" layer="94"/>
 </symbol>
 </symbols>
 <devicesets>
