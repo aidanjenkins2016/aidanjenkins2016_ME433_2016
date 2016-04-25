@@ -8,9 +8,19 @@
 // I2C pins need pull-up resistors, 2k-10k
 
 void i2c_master_setup(void) {
-  I2C2BRG = 238;            // I2CBRG = [1/(2*Fsck) - PGD]*Pblck - 2 
+    ANSELBbits.ANSB2=0; //turn on analog on SDA and SCL
+    ANSELBbits.ANSB3=0;
+    I2C2BRG = 233;   // I2CBRG = [1/(2*Fsck) - PGD]*Pblck - 2 
+                    // [1/(2*100000Hz)-104ns]*48000000Hz -2
                                     // look up PGD for your PIC32
-  I2C2CONbits.ON = 1;               // turn on the I2C2 module
+    I2C2CONbits.ON = 1;               // turn on the I2C2 module
+    
+    //config gpio pins
+    i2c_master_start();
+    i2c_master_send(0b01000000);
+    i2c_master_send(0x00); //IODIR address
+    i2c_master_send(0b11110000); //4-7 inputs 0-3 outputs
+    i2c_master_stop();
 }
 
 // Start a transmission on the I2C bus
@@ -28,9 +38,10 @@ void i2c_master_send(unsigned char byte) { // send a byte to slave
   I2C2TRN = byte;                   // if an address, bit 0 = 0 for write, 1 for read
   while(I2C2STATbits.TRSTAT) { ; }  // wait for the transmission to finish
   if(I2C2STATbits.ACKSTAT) {        // if this is high, slave has not acknowledged
-    sprintf("I2C2 Master: failed to receive ACK\r\n")};
+   /* sprintf("I2C2 Master: failed to receive ACK\r\n");*/
+  };
   }
-}
+
 
 unsigned char i2c_master_recv(void) { // receive a byte from the slave
     I2C2CONbits.RCEN = 1;             // start receiving data
@@ -49,3 +60,4 @@ void i2c_master_stop(void) {          // send a STOP:
   I2C2CONbits.PEN = 1;                // comm is complete and master relinquishes bus
   while(I2C2CONbits.PEN) { ; }        // wait for STOP to complete
 }
+
