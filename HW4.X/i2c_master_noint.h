@@ -1,11 +1,4 @@
-/* 
- * File:   i2c_master_noint.h
- * Author: aidan
- *
- * Created on April 18, 2016, 11:08 PM
- */
-
-##ifndef I2C_MASTER_NOINT_H__
+#ifndef I2C_MASTER_NOINT_H__
 #define I2C_MASTER_NOINT_H__
 // Header file for i2c_master_noint.c
 // helps implement use I2C1 as a master without using interrupts

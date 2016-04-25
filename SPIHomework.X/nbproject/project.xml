@@ -3,8 +3,8 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>HW4</name>
-            <creation-uuid>860e56d9-0b6c-4dee-b432-6e3c5ed5d7d0</creation-uuid>
+            <name>SPIHomework</name>
+            <creation-uuid>11631160-0b33-41db-a4b5-9915ad54dd61</creation-uuid>
             <make-project-type>0</make-project-type>
             <c-extensions>c</c-extensions>
             <cpp-extensions/>

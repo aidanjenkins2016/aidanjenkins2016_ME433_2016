@@ -1,22 +1,11 @@
-/* 
- * File:   main.c
- * Author: aidan
- *
- * Created on April 19, 2016, 11:09 AM
- */
-
-#include <stdio.h>
-#include <stdlib.h>
-#include "i2c_slave.h"
+//#include "i2c_slave.h" //there is no slave.h
 #include "i2c_master_noint.h"
-    // Demonstrate I2C by having the I2C1 talk to I2C5 on the same PIC32 (PIC32MX795F512H)
+// Demonstrate I2C by having the I2C2 talk to the pin expander
 // Master will use SDA1 (D9) and SCL1 (D10).  Connect these through resistors to
 // Vcc (3.3 V) (2.4k resistors recommended, but around that should be good enough)
-// Slave will use SDA5 (F4) and SCL5 (F5)
-// SDA5 -> SDA1
-// SCL5 -> SCL1
 // Two bytes will be written to the slave and then read back to the slave.
-#define SLAVE_ADDR 0x32
+//#define SLAVE_ADDR 0x32
+#define SLAVE_ADDR = 0b0100000 //slave address for pin expander
 
 int main() {
   // some initialization function to set the right speed setting
@@ -29,7 +18,7 @@ int main() {
   // some initialization function to set the right speed setting
   Startup(); 
   __builtin_disable_interrupts();
-  i2c_slave_setup(SLAVE_ADDR);              // init I2C5, which we use as a slave 
+  //i2c_slave_setup(SLAVE_ADDR);              // init I2C5, which we use as a slave 
                                             //  (comment out if slave is on another pic)
   i2c_master_setup();                       // init I2C2, which we use as a master
   __builtin_enable_interrupts();
@@ -38,7 +27,8 @@ int main() {
     WriteUART3("Master: Press Enter to begin transmission.\r\n");
     ReadUART3(buf,2);
     i2c_master_start();                     // Begin the start sequence
-    i2c_master_send(SLAVE_ADDR << 1);       // send the slave address, left shifted by 1, 
+    i2c_master_send( SLAVE_ADDR << 1);       //the control byte is 0100 A2 A1 R/W
+                                            // send the slave address, left shifted by 1, 
                                             // which clears bit 0, indicating a write
     i2c_master_send(master_write0);         // send a byte to the slave       
     i2c_master_send(master_write1);         // send another byte to the slave
