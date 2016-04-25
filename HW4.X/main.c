@@ -2,11 +2,16 @@
 #include "i2c_master_noint.h"
 #include <xc.h>
 #include <sys/attribs.h>  // __ISR macro
+#include <math.h>
+#define CS LATBbits.LATB8 //chip select pin
 
-
-void toggleGPIO(char pin, char hi_lo);
-void initGPIO();
-char getGPIO();
+//functions
+unsigned char spi_io(unsigned char o);
+void initSPI1();
+void setVoltage( unsigned char channel, unsigned char voltage);
+void setExpander(char pin, char hi_lo);
+void initExpander();
+char getExpander();
 // Demonstrate I2C by having the I2C2 talk to the pin expander
 // Master will use SDA1 (D9) and SCL1 (D10).  Connect these through resistors to
 // Vcc (3.3 V) (2.4k resistors recommended, but around that should be good enough)
@@ -48,7 +53,7 @@ char getGPIO();
 #pragma config CP = OFF                 // Code Protect (Protection Disabled)
 
 
-#define SLAVE_ADDR 0b010000000 //slave address for pin expander
+//#define SLAVE_ADDR 0b010000000 //slave address for pin expander
 
 int main() {
     
@@ -73,15 +78,6 @@ int main() {
        
    
     __builtin_enable_interrupts();
-   
-     // some initialization function to set the right speed setting
-  char buf[100] = {};                       // buffer for sending messages to the user
-  
-  unsigned char gpio_addr= 0x09;            //gpio address location
-  
-  
-   
-    _CP0_SET_COUNT(0);
     
     //stuff from HW1
     /*while(1) {
@@ -103,24 +99,108 @@ int main() {
         }
     }*/
   
+    initSPI1(); //setup spi
     
-    i2c_master_setup();
-    
-    initGPIO(); //start expander
+    i2c_master_setup(); //setup i2c
+    initExpander(); //start expander
        
-  while(1) {
+    //sine and triangle arrays
+    float sinarray[100];        //for floats
+    unsigned char sine[100];     //for ints
+    float triarray[100];        //same as sin but for triangle
+    unsigned char tri[100];
+    int i;
+    for ( i=0; i<100; i++ ) {
+        sinarray[i]=255.0*((sin((i/100.0)*2.0*3.1459)+1.0)/2.0);
+        sine[i]=(unsigned char) sinarray[i];   //back to integer
+        //triangle
+        triarray[i]=255.0*(i/99.0);
+        tri[i]= (unsigned char) sinarray[i];
+        
+    }
+  
+    
+    
+    
+  while(1){
      
-      if ( (getGPIO() & 0b01000000) == 0b01000000) {
-          toggleGPIO( 0b00000001,1 ); 
+      //SPI to DAC
+      int j;
+      for ( j=0; j<100; j++ ) {
+          setVoltage(0, sine[j]);
+          setVoltage(1, tri[j]);
+          
+          _CP0_SET_COUNT(0);
+          
+          while(_CP0_GET_COUNT_() < 24000){
+              ;
+          }
+      }
+     
+      
+      //I2C communication
+      
+      if ( (getExpander() & 0b01000000) == 0b01000000) {
+          setExpander( 0b00000001,1 ); 
       }
       else {
-          toggleGPIO(0b00000001,0);
+          setExpander(0b00000001,0);
       }
   }
   return 0;
 }
 
-void initGPIO() {
+unsigned char spi_io(unsigned char o) {
+  SPI1BUF = o;
+  while(!SPI1STATbits.SPIRBF) { // wait to receive the byte
+    ;
+  }
+  return SPI1BUF;
+}
+// initialize spi4 and the ram module
+void initSPI1() {
+  // set up the chip select pin (B8) as an output
+  // the chip select pin is used by the sram to indicate
+  // when a command is beginning (clear CS to low) and when it
+  // is ending (set CS high)
+    //ANSELBbits.ANSB8=0; //not analog capable
+    TRISBbits.TRISB8 = 0;
+  CS = 1;
+
+  //SDI/DSO
+  SDI1Rbits.SDI1R=0;      //A1 as SDI  
+  RPB7Rbits.RPB7R=0b0011; //SDO1 as B7
+  
+  // Master - SPI1, pins are: SDI1(A1), SDO1(), SCK1(25).  
+  // we manually control SS4 as a digital output (F12)
+  // since the pic is just starting, we know that spi is off. We rely on defaults here
+ 
+  // setup spi1
+  SPI1CON = 0;              // turn off the spi module and reset it
+  SPI1BUF;                  // clear the rx buffer by reading from it
+  SPI1BRG = 300;            // baud rate to 10 MHz [SPI1BRG = (80000000/(2*desired))-1]
+  SPI1STATbits.SPIROV = 0;  // clear the overflow bit
+  SPI1CONbits.CKE = 1;      // data changes when clock goes from hi to lo (since CKP is 0)
+  SPI1CONbits.MSTEN = 1;    // master operation
+  SPI1CONbits.ON = 1;       // turn on spi 1
+   
+}
+
+void setVoltage(unsigned char channel, unsigned char voltage) {
+    short temp=0b0000000000000000; //empty 16bit
+    // bit shifting
+    temp |= voltage << 4;
+    temp |= 0b111 << 12;
+    temp |= channel << 15
+            
+    CS=0;
+    spi_io(temp >> 8);
+    spi_io(temp);
+    CS=1;
+    
+}
+
+void initExpander() {
     //setup the expander with GPIO0-3 off
     //inputs low
     i2c_master_start();
@@ -131,7 +211,7 @@ void initGPIO() {
     
 }
 
-char getGPIO() {
+char getExpander() {
     i2c_master_start();
     i2c_master_send(0b01000000);
     i2c_master_send(0x09); //select GPIO byte
@@ -145,7 +225,7 @@ char getGPIO() {
         
 }
 
-void toggleGPIO(char pin, char hi_lo) {
+void setExpander(char pin, char hi_lo) {
     char set_hi_lo=0b1111111; //pin high
     if (hi_lo==0) {
         set_hi_lo=0b0000000; //set pin low

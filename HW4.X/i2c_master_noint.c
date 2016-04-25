@@ -8,7 +8,7 @@
 // I2C pins need pull-up resistors, 2k-10k
 
 void i2c_master_setup(void) {
-    ANSELBbits.ANSB2=0; //turn on analog on SDA and SCL
+    ANSELBbits.ANSB2=0; //turn off analog on SDA and SCL
     ANSELBbits.ANSB3=0;
     I2C2BRG = 233;   // I2CBRG = [1/(2*Fsck) - PGD]*Pblck - 2 
                     // [1/(2*100000Hz)-104ns]*48000000Hz -2
