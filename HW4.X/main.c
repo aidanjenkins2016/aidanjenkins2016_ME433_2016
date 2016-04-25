@@ -8,7 +8,7 @@
 //functions
 unsigned char spi_io(unsigned char o);
 void initSPI1();
-void setVoltage( unsigned char channel, unsigned char voltage);
+void setVoltage(unsigned char channel, unsigned char voltage);
 void setExpander(char pin, char hi_lo);
 void initExpander();
 char getExpander();
@@ -132,7 +132,7 @@ int main() {
           
           _CP0_SET_COUNT(0);
           
-          while(_CP0_GET_COUNT_() < 24000){
+          while(_CP0_GET_COUNT() < 24000){
               ;
           }
       }
@@ -164,8 +164,8 @@ void initSPI1() {
   // when a command is beginning (clear CS to low) and when it
   // is ending (set CS high)
     //ANSELBbits.ANSB8=0; //not analog capable
-    TRISBbits.TRISB8 = 0;
-  CS = 1;
+    TRISBbits.TRISB8 = 0;//B8 as an output
+    CS = 1; //B8 high
 
   //SDI/DSO
   SDI1Rbits.SDI1R=0;      //A1 as SDI  
@@ -191,12 +191,12 @@ void setVoltage(unsigned char channel, unsigned char voltage) {
     // bit shifting
     temp |= voltage << 4;
     temp |= 0b111 << 12;
-    temp |= channel << 15
+    temp |= channel << 15;
             
-    CS=0;
+    CS = 0;
     spi_io(temp >> 8);
     spi_io(temp);
-    CS=1;
+    CS = 1;
     
 }
 
