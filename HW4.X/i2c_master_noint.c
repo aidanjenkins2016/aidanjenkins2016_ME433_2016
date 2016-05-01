@@ -2,6 +2,7 @@
 #include <xc.h>
 #include <sys/attribs.h>
 
+
 // I2C Master utilities, 100 kHz, using polling rather than interrupts
 // The functions must be callled in the correct order as per the I2C protocol
 // Change I2C2 to the I2C channel you are using
@@ -14,13 +15,6 @@ void i2c_master_setup(void) {
                     // [1/(2*100000Hz)-104ns]*48000000Hz -2
                                     // look up PGD for your PIC32
     I2C2CONbits.ON = 1;               // turn on the I2C2 module
-    
-    //config gpio pins
-    i2c_master_start();
-    i2c_master_send(0b01000000);
-    i2c_master_send(0x00); //IODIR address
-    i2c_master_send(0b11110000); //4-7 inputs 0-3 outputs
-    i2c_master_stop();
 }
 
 // Start a transmission on the I2C bus

@@ -11,7 +11,7 @@ void initSPI1();
 void setVoltage(unsigned char channel, unsigned char voltage);
 void setExpander(char pin, char hi_lo);
 void initExpander();
-char getExpander();
+unsigned char getExpander();
 // Demonstrate I2C by having the I2C2 talk to the pin expander
 // Master will use SDA1 (D9) and SCL1 (D10).  Connect these through resistors to
 // Vcc (3.3 V) (2.4k resistors recommended, but around that should be good enough)
@@ -54,10 +54,79 @@ char getExpander();
 
 
 //#define SLAVE_ADDR 0b010000000 //slave address for pin expander
+/*
+void setVoltage(unsigned char channel, unsigned char voltage) {
+    short temp=0b0000000000000000; //empty 16bit
+    // bit shifting
+    temp |= (voltage << 4);
+    temp |= (0b111 << 12);
+    temp |= (channel << 15);
+            
+    CS = 0;             //enable ram
+    spi_io(0x2);       // sequential write operation
+    spi_io(temp >> 8); //send first 8 bits
+    spi_io(temp);       //send last 8 bits
+    CS = 1;             //end
+    
+}
+ */
+
+void initExpander() {
+    //setup the expander with GPIO0-3 off
+    //inputs low
+    i2c_master_start();
+    i2c_master_send(0x40); //i2c slave address
+    i2c_master_send(0x00);      //I/o address
+    i2c_master_send(0xF0);       // set I/O 0b11110000
+    i2c_master_stop();
+    
+}
+
+unsigned char getExpander() {
+    i2c_master_start();
+    i2c_master_send(0x40);
+    i2c_master_send(0x09); //select GPIO addr
+    i2c_master_restart();
+    i2c_master_send(0x41); //read
+    unsigned char read= i2c_master_recv() >> 7; //store read value from GP7
+    i2c_master_ack(1); //received bit stop sending
+    i2c_master_stop(); // 
+    
+    return read;
+        
+}
+
+void setExpander(char pin, char level) {
+  
+    
+    i2c_master_start();
+    i2c_master_send(0x40);
+    i2c_master_send(0x0A); //GPIO output latch
+    //i2c_master_send(0x01);
+       
+    if(level==1) 
+    {
+        i2c_master_send(0x01); //set GP0 high
+       
+    }
+
+    
+    if (level == 0) 
+    {
+        i2c_master_send(0x00);
+    }
+    
+    
+    i2c_master_stop();
+    
+}
 
 int main() {
     
  __builtin_disable_interrupts();
+ 
+ 
+     
 
     // set the CP0 CONFIG register to indicate that kseg0 is cacheable (0x3)
     __builtin_mtc0(_CP0_CONFIG, _CP0_CONFIG_SELECT, 0xa4210583);
@@ -79,6 +148,8 @@ int main() {
    
     __builtin_enable_interrupts();
     
+ 
+    
     //stuff from HW1
     /*while(1) {
 	    // use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
@@ -99,12 +170,14 @@ int main() {
         }
     }*/
   
-    initSPI1(); //setup spi
+   // initSPI1(); //setup spi
     
-    i2c_master_setup(); //setup i2c
-    initExpander(); //start expander
-       
-    //sine and triangle arrays
+    i2c_master_setup(); //setup i2c   
+    initExpander(); //start expander config I/O pins
+    
+ 
+    
+    /*    //sine and triangle arrays
     float sinarray[100];        //for floats
     unsigned char sine[100];     //for ints
     float triarray[100];        //same as sin but for triangle
@@ -119,11 +192,12 @@ int main() {
         
     }
   
-    
-    
+    */
+    char data;
     
   while(1){
-     
+         
+    /*
       //SPI to DAC
       int j;
       for ( j=0; j<100; j++ ) {
@@ -136,21 +210,18 @@ int main() {
               ;
           }
       }
-     
+     */
       
-      //I2C communication
+          
+    data=getExpander();
+    setExpander(0,data);
       
-      if ( (getExpander() & 0b01000000) == 0b01000000) {
-          setExpander( 0b00000001,1 ); 
-      }
-      else {
-          setExpander(0b00000001,0);
-      }
-  }
+    }
   return 0;
 }
 
-unsigned char spi_io(unsigned char o) {
+/*
+ * unsigned char spi_io(unsigned char o) {
   SPI1BUF = o;
   while(!SPI1STATbits.SPIRBF) { // wait to receive the byte
     ;
@@ -178,7 +249,7 @@ void initSPI1() {
   // setup spi1
   SPI1CON = 0;              // turn off the spi module and reset it
   SPI1BUF;                  // clear the rx buffer by reading from it
-  SPI1BRG = 300;            // baud rate to 10 MHz [SPI1BRG = (80000000/(2*desired))-1]
+  SPI1BRG = 300;            // baud rate to 10 MHz [SPI1BRG = (48000000/(2*desired))-1]
   SPI1STATbits.SPIROV = 0;  // clear the overflow bit
   SPI1CONbits.CKE = 1;      // data changes when clock goes from hi to lo (since CKP is 0)
   SPI1CONbits.MSTEN = 1;    // master operation
@@ -186,56 +257,4 @@ void initSPI1() {
    
 }
 
-void setVoltage(unsigned char channel, unsigned char voltage) {
-    short temp=0b0000000000000000; //empty 16bit
-    // bit shifting
-    temp |= voltage << 4;
-    temp |= 0b111 << 12;
-    temp |= channel << 15;
-            
-    CS = 0;
-    spi_io(temp >> 8);
-    spi_io(temp);
-    CS = 1;
-    
-}
-
-void initExpander() {
-    //setup the expander with GPIO0-3 off
-    //inputs low
-    i2c_master_start();
-    i2c_master_send(0b01000000); //i2c slave address
-    i2c_master_send(0x0A);      // OLAT address
-    i2c_master_send(0x0);       //all pins low
-    i2c_master_stop();
-    
-}
-
-char getExpander() {
-    i2c_master_start();
-    i2c_master_send(0b01000000);
-    i2c_master_send(0x09); //select GPIO byte
-    i2c_master_restart();
-    i2c_master_send(0b01000001); //read
-    char read= i2c_master_recv(); //store read value
-    i2c_master_ack(1); //received bit
-    i2c_master_stop(); // 
-    
-    return read;
-        
-}
-
-void setExpander(char pin, char hi_lo) {
-    char set_hi_lo=0b1111111; //pin high
-    if (hi_lo==0) {
-        set_hi_lo=0b0000000; //set pin low
-    }
-    
-    i2c_master_start();
-    i2c_master_send(0b01000000);
-    i2c_master_send(0x0A); //GPIO output latch
-    i2c_master_send(pin); //selected pins high, or all low
-    i2c_master_send(set_hi_lo);
-    i2c_master_stop();
-    
-}
+*/
