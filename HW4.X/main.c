@@ -5,13 +5,8 @@
 #include <math.h>
 #define CS LATBbits.LATB8 //chip select pin
 
-//functions
-unsigned char spi_io(unsigned char o);
-void initSPI1();
-void setVoltage(unsigned char channel, unsigned char voltage);
-void setExpander(char pin, char hi_lo);
-void initExpander();
-unsigned char getExpander();
+
+
 // Demonstrate I2C by having the I2C2 talk to the pin expander
 // Master will use SDA1 (D9) and SCL1 (D10).  Connect these through resistors to
 // Vcc (3.3 V) (2.4k resistors recommended, but around that should be good enough)
@@ -52,24 +47,78 @@ unsigned char getExpander();
 #pragma config BWP = OFF                // Boot Flash Write Protect bit (Protection Disabled)
 #pragma config CP = OFF                 // Code Protect (Protection Disabled)
 
+//Functions
 
-//#define SLAVE_ADDR 0b010000000 //slave address for pin expander
-/*
-void setVoltage(unsigned char channel, unsigned char voltage) {
-    short temp=0b0000000000000000; //empty 16bit
-    // bit shifting
-    temp |= (voltage << 4);
-    temp |= (0b111 << 12);
-    temp |= (channel << 15);
-            
-    CS = 0;             //enable ram
-    spi_io(0x2);       // sequential write operation
-    spi_io(temp >> 8); //send first 8 bits
-    spi_io(temp);       //send last 8 bits
-    CS = 1;             //end
-    
+int sinewave[100];
+int trianglewave[200];
+
+// initialize spi4 and the ram module
+void initSPI1() {
+  // set up the chip select pin (B8) as an output
+  // the chip select pin is used by the sram to indicate
+  // when a command is beginning (clear CS to low) and when it
+  // is ending (set CS high)
+    //ANSELBbits.ANSB8=0; //not analog capable
+    TRISBbits.TRISB8 = 0;//B8 as an output
+    CS = 1; //B8 high
+  //SDI/DSO
+  SDI1Rbits.SDI1R=0;      //A1 as SDI  
+  RPB7Rbits.RPB7R=0b0011; //SDO1 as B7
+  
+  // Master - SPI1, pins are: SDI1(A1), SDO1(), SCK1(25).  
+  // we manually control SS4 as a digital output (F12)
+  // since the pic is just starting, we know that spi is off. We rely on defaults here
+ 
+  // setup spi1
+  SPI1CON = 0;              // turn off the spi module and reset it
+  SPI1BUF;                  // clear the rx buffer by reading from it
+  SPI1BRG = 300;            // baud rate to 10 MHz [SPI1BRG = (48000000/(2*desired))-1]
+  SPI1STATbits.SPIROV = 0;  // clear the overflow bit
+  SPI1CONbits.CKE = 1;      // data changes when clock goes from hi to lo (since CKP is 0)
+  SPI1CONbits.MSTEN = 1;    // master operation
+  SPI1CONbits.ON = 1;       // turn on spi 1
+ }
+ unsigned char SPI1_IO(unsigned char write) {
+  SPI1BUF = write;
+  while(!SPI1STATbits.SPIRBF) { // wait to receive the byte
+    ;
+  }
+  return SPI1BUF;
 }
- */
+
+
+
+void setVoltage( unsigned char channel, unsigned char voltage){
+    unsigned short value=0;
+    if (channel ==0){
+    value = (0b0011 << 12) + (voltage << 4);
+        CS = 0;                                 
+        SPI1_IO((value & 0xFF00) >> 8 ); 
+        SPI1_IO(value & 0x00FF);         
+        CS = 1;                          
+    }
+    
+    if (channel == 1){
+        
+      value = (0b1011 << 12) + (voltage << 4);
+        CS = 0;
+        SPI1_IO((value & 0xFF00) >> 8 ); 
+        SPI1_IO(value & 0x00FF);         
+        CS = 1;
+    }
+}
+
+void waveform(void){
+    
+  int i;
+  for(i = 0; i < 100; i++){
+    sinewave[i] = (int)(128.0 + 127.5 * sin(M_PI * 0.02 * i));
+  }
+  for(i = 0; i < 200; i++){
+    trianglewave[i] = (int)(1.28 * i);
+  }
+}
+
 
 void initExpander() {
     //setup the expander with GPIO0-3 off
@@ -147,114 +196,43 @@ int main() {
        
    
     __builtin_enable_interrupts();
-    
- 
-    
-    //stuff from HW1
-    /*while(1) {
-	    // use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
-		// remember the core timer runs at half the CPU speed
-        
-        if (PORTBbits.RB4==0) {          
-            if (_CP0_GET_COUNT() >= 12000){
-                LATAbits.LATA4= ~LATAbits.LATA4; //toggle
-                _CP0_SET_COUNT(0);
-            }
-            else {
-            //do nothing
-            }
-    
-        }
-        else 
-            LATAbits.LATA4=0;//no button then LED off
-        }
-    }*/
   
-   // initSPI1(); //setup spi
     
     i2c_master_setup(); //setup i2c   
     initExpander(); //start expander config I/O pins
-    
- 
-    
-    /*    //sine and triangle arrays
-    float sinarray[100];        //for floats
-    unsigned char sine[100];     //for ints
-    float triarray[100];        //same as sin but for triangle
-    unsigned char tri[100];
-    int i;
-    for ( i=0; i<100; i++ ) {
-        sinarray[i]=255.0*((sin((i/100.0)*2.0*3.1459)+1.0)/2.0);
-        sine[i]=(unsigned char) sinarray[i];   //back to integer
-        //triangle
-        triarray[i]=255.0*(i/99.0);
-        tri[i]= (unsigned char) sinarray[i];
-        
-    }
-  
-    */
     char data;
+    int countA=0;
+    int countB=0;
+    initSPI1();
     
   while(1){
-         
-    /*
-      //SPI to DAC
-      int j;
-      for ( j=0; j<100; j++ ) {
-          setVoltage(0, sine[j]);
-          setVoltage(1, tri[j]);
-          
-          _CP0_SET_COUNT(0);
-          
-          while(_CP0_GET_COUNT() < 24000){
-              ;
-          }
-      }
-     */
       
-          
+      _CP0_SET_COUNT(0);
+      setVoltage(0, sinewave[countA]);
+      setVoltage(1, trianglewave[countB]);
+      countA++;
+      countB++;
+      
+      //reset counters
+      if(countA>=100){
+          countA=0;
+      }
+      
+      if(countB>=200){
+          countB=0;
+      }
+     
+       //delay
+    while(_CP0_GET_COUNT()<= 24000){
+        ;
+    }
+      
     data=getExpander();
     setExpander(0,data);
       
+    
+   
     }
   return 0;
 }
 
-/*
- * unsigned char spi_io(unsigned char o) {
-  SPI1BUF = o;
-  while(!SPI1STATbits.SPIRBF) { // wait to receive the byte
-    ;
-  }
-  return SPI1BUF;
-}
-// initialize spi4 and the ram module
-void initSPI1() {
-  // set up the chip select pin (B8) as an output
-  // the chip select pin is used by the sram to indicate
-  // when a command is beginning (clear CS to low) and when it
-  // is ending (set CS high)
-    //ANSELBbits.ANSB8=0; //not analog capable
-    TRISBbits.TRISB8 = 0;//B8 as an output
-    CS = 1; //B8 high
-
-  //SDI/DSO
-  SDI1Rbits.SDI1R=0;      //A1 as SDI  
-  RPB7Rbits.RPB7R=0b0011; //SDO1 as B7
-  
-  // Master - SPI1, pins are: SDI1(A1), SDO1(), SCK1(25).  
-  // we manually control SS4 as a digital output (F12)
-  // since the pic is just starting, we know that spi is off. We rely on defaults here
- 
-  // setup spi1
-  SPI1CON = 0;              // turn off the spi module and reset it
-  SPI1BUF;                  // clear the rx buffer by reading from it
-  SPI1BRG = 300;            // baud rate to 10 MHz [SPI1BRG = (48000000/(2*desired))-1]
-  SPI1STATbits.SPIROV = 0;  // clear the overflow bit
-  SPI1CONbits.CKE = 1;      // data changes when clock goes from hi to lo (since CKP is 0)
-  SPI1CONbits.MSTEN = 1;    // master operation
-  SPI1CONbits.ON = 1;       // turn on spi 1
-   
-}
-
-*/
