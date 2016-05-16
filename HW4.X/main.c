@@ -53,19 +53,22 @@ int sinewave[100];
 int trianglewave[200];
 
 // initialize spi4 and the ram module
-void initSPI1() {
+void initSPI1(void) {
   // set up the chip select pin (B8) as an output
   // the chip select pin is used by the sram to indicate
   // when a command is beginning (clear CS to low) and when it
   // is ending (set CS high)
     //ANSELBbits.ANSB8=0; //not analog capable
-    TRISBbits.TRISB8 = 0;//B8 as an output
+    TRISBbits.TRISB7 = 0; // B7 as an output (SDO)
+    TRISBbits.TRISB8 = 0;//B8 as an output (CS) 
     CS = 1; //B8 high
-  //SDI/DSO
-  SDI1Rbits.SDI1R=0;      //A1 as SDI  
-  RPB7Rbits.RPB7R=0b0011; //SDO1 as B7
   
-  // Master - SPI1, pins are: SDI1(A1), SDO1(), SCK1(25).  
+    //SDI/DSO
+  //SDI1Rbits.SDI1R=0;      //A1 as SDI  
+  RPB7Rbits.RPB7R=0b0011; //SDO1 as B7
+  LATBbits.LATB4=1;
+  
+  // Master - SPI1, pins are: SDI1(A1), SDO1(B7), SCK1(25).  
   // we manually control SS4 as a digital output (F12)
   // since the pic is just starting, we know that spi is off. We rely on defaults here
  
