@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/aidan/Documents/GitHub/aidanjenkins2016_ME433_2016/HW6.X/main.c</file>
+            <file>file:/C:/Users/aidan/Documents/GitHub/aidanjenkins2016_ME433_2016/HW6.X/ILI9163C.h</file>
+            <file>file:/C:/Users/aidan/Documents/GitHub/aidanjenkins2016_ME433_2016/HW6.X/ILI9163C.c</file>
+            <file>file:/C:/Users/aidan/Documents/GitHub/aidanjenkins2016_ME433_2016/HW6.X/nbproject/Makefile-impl.mk</file>
+            <file>file:/C:/Users/aidan/Documents/GitHub/aidanjenkins2016_ME433_2016/HW6.X/i2c_master_noint.c</file>
+            <file>file:/C:/Users/aidan/Documents/GitHub/aidanjenkins2016_ME433_2016/HW6.X/nbproject/Makefile-default.mk</file>
+            <file>file:/C:/Users/aidan/Documents/GitHub/aidanjenkins2016_ME433_2016/HW6.X/spi.c</file>
+            <file>file:/C:/Users/aidan/Documents/GitHub/aidanjenkins2016_ME433_2016/HW6.X/spi.h</file>
+        </group>
     </open-files>
 </project-private>

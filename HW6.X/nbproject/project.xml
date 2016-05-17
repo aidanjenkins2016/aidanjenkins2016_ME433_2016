@@ -6,9 +6,9 @@
             <name>HW6</name>
             <creation-uuid>a9d26cb4-bf29-4b5e-83f8-b29a542327a5</creation-uuid>
             <make-project-type>0</make-project-type>
-            <c-extensions/>
+            <c-extensions>c</c-extensions>
             <cpp-extensions/>
-            <header-extensions/>
+            <header-extensions>h</header-extensions>
             <asminc-extensions/>
             <sourceEncoding>ISO-8859-1</sourceEncoding>
             <make-dep-projects/>
