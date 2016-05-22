@@ -29,7 +29,7 @@ void initSPI1(void) {
     //SDI/DSO
   //SDI1Rbits.SDI1R=0;      //A1 as SDI  
   RPB7Rbits.RPB7R=0b0011; //SDO1 as B7
-  LATBbits.LATB4=1;
+  //LATBbits.LATB4=1;
   
   // Master - SPI1, pins are: SDI1(A1), SDO1(B7), SCK1(25).  
   // we manually control SS4 as a digital output (F12)
@@ -55,6 +55,8 @@ void initSPI1(void) {
   return SPI1BUF;
 }
 */
+
+/*
 // initialize spi4 and the ram module
 void ram_init(void) {
   // set up the chip select pin as an output
@@ -109,4 +111,4 @@ void ram_read(unsigned short addr, char data[], int len) {
   }
   CS = 1;
 }
-
+*/

@@ -1,10 +1,12 @@
 //#include "i2c_slave.h" //there is no slave.h
-#include "i2c_master_noint.h"
+//#include "i2c_master_noint.h"
 #include <xc.h>
 #include <sys/attribs.h>  // __ISR macro
 #include <math.h>
 #include "ILI9163C.h"
-#define CS LATBbits.LATB8 //chip select pin
+
+
+
 
 
 
@@ -48,9 +50,23 @@
 #pragma config BWP = OFF                // Boot Flash Write Protect bit (Protection Disabled)
 #pragma config CP = OFF                 // Code Protect (Protection Disabled)
 
-void LCD_sprintf(unsigned short x, unsigned short y, unsigned short color, char c);
+void LCD_sprintf(unsigned short x, unsigned short y, unsigned short color, char c){
+    char pixel;
+    char LCD_ascii;
+    LCD_ascii= c - 0x20;
+    int i, j;
+    for(i=0; i<5; i++){
+        for(j=0; j<8; j++){
+            pixel=ASCII[LCD_ascii][i];
+            if((pixel >> (7-j)) & 1){
+                LCD_drawPixel(x+i, y+(7-j),color);
+            }
+        }
+    }
+    
+}
+
 char msg[100];
-int i, l, m;
 
 int main() {
     
@@ -69,42 +85,24 @@ __builtin_disable_interrupts();
     DDPCONbits.JTAGEN = 0;
     
     // do your TRIS and LAT commands here
-   TRISBbits.TRISB4 = 1; // pin 12 as an output
-   TRISAbits.TRISA4 = 0; //pin 11 as an input
-   LATAbits.LATA4 = 0; //set pin 12 
+   //TRISBbits.TRISB4 = 1; // pin 12 as an output
+   TRISAbits.TRISA4 = 0; //pins 11 as an input
+  // LATAbits.LATA4 = 0; //set pin 12 
       
    SPI1_init();
    LCD_init();
-   LCD_clearScreen(BLACK);
+   
   
 __builtin_enable_interrupts();
   
+LCD_clearScreen(WHITE);
 
-
-
-/*
-sprintf(msg, "hello world");
-int n=0;
-while(msg[n]){
-    LCD_sprintf(28+n*5, 32, WHITE, msg[n]);
+sprintf(msg, "Hello World 1337!!");
+int k=0;
+while(msg[k]){
+    LCD_sprintf(28+k*5, 32, BLACK, msg[k]);
+    k++;
 }
-*/
-    
- 
   return 0;
 }
 
-void LCD_sprintf(unsigned short x, unsigned short y, unsigned short color, char c){
-    char pixel;
-    char LCD_ascii;
-    LCD_ascii= c - 0x20;
-    for(l=0; l<5; l++){
-        for(m=0; m<8; m++){
-            pixel=ASCII[LCD_ascii][1];
-            if((pixel>>(7-m))&1){
-                LCD_drawPixel(x+1, y+(7-m),color);
-            }
-        }
-    }
-    
-}

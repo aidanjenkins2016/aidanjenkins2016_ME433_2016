@@ -15,11 +15,10 @@
 
 #include <xc.h>
 #include "ILI9163C.h"
+#include <time.h>
 
 void SPI1_init() {
-    TRISBbits.TRISB4 = 1; // pin 12 as an output
-    LATAbits.LATA4 = 1; //set pin 12 
-	
+    
     SDI1Rbits.SDI1R = 0b0100; // B8 is SDI1
     RPA1Rbits.RPA1R = 0b0011; // A1 is SDO1
     TRISBbits.TRISB7 = 0; // SS is B7
@@ -165,6 +164,14 @@ void LCD_init() {
 	while (_CP0_GET_COUNT() < time + 48000000/2/1000) {} //delay(1);
 
 	LCD_command(CMD_RAMWR);//Memory Write
+    
+    /*int j;
+    for(j=0; j<100000000; j++){
+        ;
+    }
+    TRISBbits.TRISB4 = 1; // pin 12 as an output
+    LATAbits.LATA4 = 1; //set pin 12 
+    */
 }
 
 void LCD_drawPixel(unsigned short x, unsigned short y, unsigned short color) {
