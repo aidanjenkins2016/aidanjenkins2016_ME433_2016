@@ -4,6 +4,7 @@ package com.example.aidan.aidanscameraapp;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
@@ -20,12 +21,15 @@ import static android.graphics.Color.green;
 import static android.graphics.Color.red;
 
 public class MainActivity extends Activity implements TextureView.SurfaceTextureListener {
-    SeekBar myControl; //initializations for slider
-    TextView myTextView;
+    //SeekBar myControl; //initializations for slider
+    //TextView myTextView;
     private Camera mCamera;
     private TextureView mTextureView;
     private SurfaceView mSurfaceView;
     private SurfaceHolder mSurfaceHolder;
+    private SeekBar myControl;
+    private TextView myTextView;
+
     //change resolution here!
     private Bitmap bmp = Bitmap.createBitmap(400,300,Bitmap.Config.ARGB_8888);
 
@@ -39,12 +43,14 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
     private TextView mTextView;
 
     static long prevtime = 0; // for FPS calculation
+    static int greenthresh=0 ; //threshold value for green
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        myControl = (SeekBar) findViewById(R.id.seek1);//add one slider
+        myControl = (SeekBar) findViewById(R.id.seek1);
         myTextView = (TextView) findViewById(R.id.textView01);
+        myTextView.setText("Green Level!");
         setMyControlListener();
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); // keeps the screen from turning off
@@ -60,17 +66,31 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
         paint1.setColor(0xffff0000); // red
         paint1.setTextSize(24);
     }
-    private void setMyControlListener() {
-        myControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+   private void setMyControlListener() {
+
+       int start_threshold=330; //ENTER STARTING THRESHOLD HERE AFTER TESTING WITH THE GREEN/BLACK OVERLAY
+       myControl.setMax(510); //max value for slider
+       myControl.setProgress(start_threshold);
+       myTextView.setText("Threshold: "+start_threshold);
+
+       myControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
 
             int progressChanged = 0;
             Camera.Size bestSize=null;
-            List<Camera.Size> sizeList=mCamera.getParameters().getSupportedPreviewSizes();
+            //List<Camera.Size> sizeList=mCamera.getParameters().getSupportedPreviewSizes();
+
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
                 progressChanged = progress;
-                myTextView.setText("The value is: "+progress);
+                myTextView.setText("Threshold: "+progress);
+                greenthresh=progress;
+            }
+
+            public int setThreshold(){
+                return progressChanged;
             }
 
             @Override
@@ -83,13 +103,14 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
             }
 
 
+
         });
     }
 
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         mCamera = Camera.open();
         Camera.Parameters parameters = mCamera.getParameters();
-        parameters.setPreviewSize(400, 300); //resolution here!!
+        parameters.setPreviewSize(640, 480); //resolution here!!
         parameters.setColorEffect(Camera.Parameters.EFFECT_MONO); // black and white
         parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_INFINITY); // no autofocusing
         //parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH); // flash always on
@@ -123,7 +144,7 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
         if (c != null) {
 
             int[] pixels = new int[bmp.getWidth()];
-            int startY = 15; // which row in the bitmap to analyse to read
+            int startY = 50; // which row in the bitmap to analyse to read
             // only look at one row in the image
             bmp.getPixels(pixels, 0, bmp.getWidth(), 0, startY, bmp.getWidth(), 1); // (array name, offset inside array, stride (size of row), start x, start y, num pixels to read per row, num rows to read)
 
@@ -133,19 +154,50 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
             int[] thresholdedPixels = new int[bmp.getWidth()];
             int wbTotal = 0; // total mass
             int wbCOM = 0; // total (mass time position)
-            for (int i = 0; i < bmp.getWidth(); i++) {
-                // sum the red, green and blue, subtract from 255 to get the darkness of the pixel.
-                // if it is greater than some value (600 here), consider it black
-                // play with the 600 value if you are having issues reliably seeing the line
-                if (255*3-(red(pixels[i])+green(pixels[i])+blue(pixels[i])) > 600) {
-                    thresholdedPixels[i] = 255*3;
+
+            /*
+            //RUN THIS FOR LOOP FOR CALIBRATION
+            int[] thresholdedColors = new int[bmp.getWidth()];
+            for (int j = 0; j < bmp.getHeight(); j++){
+                for (int i = 0; i < bmp.getWidth(); i++) {
+                    // sum the red, green and blue, subtract from 255 to get the darkness of the pixel.
+                    // if it is greater than some value (600 here), consider it black
+                    // play with the 600 value if you are having issues reliably seeing the line
+                    if (255 * 2 - (red(pixels[i]) + green(pixels[i]) ) > greenthresh) {
+                        thresholdedPixels[i] = 255*3; //white
+                        thresholdedColors[i] = Color.rgb(0, 0, 0);//make the high red and green areas black
+                    } else {
+                        thresholdedPixels[i] = 0;//black
+                        thresholdedColors[i] = Color.rgb(0, 255, 0); // make the not high red and green areas green
+                    }
+
+                    wbTotal = wbTotal + thresholdedPixels[i];
+                    wbCOM = wbCOM + thresholdedPixels[i] * i;
+
                 }
-                else {
-                    thresholdedPixels[i] = 0;
-                }
-                wbTotal = wbTotal + thresholdedPixels[i];
-                wbCOM = wbCOM + thresholdedPixels[i]*i;
+                bmp.setPixels(thresholdedColors, 0, bmp.getWidth(), 0, j, bmp.getWidth(), 1);
             }
+            */
+                //RUN THIS FOR LOOP FOR THE COMPETITION
+                for (int i = 0; i < bmp.getWidth(); i++) {
+                    // sum the red, green and blue, subtract from 255 to get the darkness of the pixel.
+                    // if it is greater than some value (600 here), consider it black
+                    // play with the 600 value if you are having issues reliably seeing the line
+                    if (255 * 2 - (red(pixels[i]) + green(pixels[i])) > greenthresh) {
+                        thresholdedPixels[i] = 255 * 3; //white
+                        //thresholdedColors[i] = Color.rgb(0, 0, 0);//make the high red and green areas black
+                    } else {
+                        thresholdedPixels[i] = 0;//black
+                        //thresholdedColors[i] = Color.rgb(0, 255, 0); // make the not high red and green areas green
+                    }
+
+                    wbTotal = wbTotal + thresholdedPixels[i];
+                    wbCOM = wbCOM + thresholdedPixels[i] * i;
+
+                }
+
+
+
             int COM;
             //watch out for divide by 0
             if (wbTotal<=0) {
@@ -154,6 +206,7 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
             else {
                 COM = wbCOM/wbTotal;
             }
+
 
             // draw a circle where you think the COM is
             canvas.drawCircle(COM, startY, 5, paint1);
