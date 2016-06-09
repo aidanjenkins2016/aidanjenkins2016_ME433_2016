@@ -8,7 +8,7 @@
 // Change I2C2 to the I2C channel you are using
 // I2C pins need pull-up resistors, 2k-10k
 
-void i2c_master_setup(void) {
+void initI2C2(void) {
     ANSELBbits.ANSB2=0; //turn off analog on SDA and SCL
     ANSELBbits.ANSB3=0;
     I2C2BRG = 233;   // I2CBRG = [1/(2*Fsck) - PGD]*Pblck - 2 

@@ -5,11 +5,6 @@
 #include <math.h>
 #include "ILI9163C.h"
 
-
-
-
-
-
 // Demonstrate I2C by having the I2C2 talk to the pin expander
 // Master will use SDA1 (D9) and SCL1 (D10).  Connect these through resistors to
 // Vcc (3.3 V) (2.4k resistors recommended, but around that should be good enough)
@@ -68,6 +63,7 @@ void LCD_sprintf(unsigned short x, unsigned short y, unsigned short color, char 
 
 char msg[100];
 
+   
 int main() {
     
 __builtin_disable_interrupts();
@@ -95,7 +91,8 @@ __builtin_disable_interrupts();
   
 __builtin_enable_interrupts();
   
-LCD_clearScreen(WHITE);
+LCD_clearScreen(CYAN);
+
 
 sprintf(msg, "Hello World 1337!!");
 int k=0;
@@ -103,6 +100,9 @@ while(msg[k]){
     LCD_sprintf(28+k*5, 32, BLACK, msg[k]);
     k++;
 }
-  return 0;
+ 
+  
+
+return 0;
 }
 

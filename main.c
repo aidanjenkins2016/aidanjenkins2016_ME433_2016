@@ -106,13 +106,38 @@ int main() {
     
     // do your TRIS and LAT commands here
    TRISBbits.TRISB4 = 1; // pin 12 as an output
-   TRISAbits.TRISA4 = 0; //pin 11 as an input
    LATAbits.LATA4 = 0; //set pin 12 
+   TRISAbits.TRISA4 = 0; //pin 11 as an input
+   
        
     
     __builtin_enable_interrupts();
     
-   
+    
+    // Setup OC1 and OC2
+    // pins
+    //Setup OC1 and OC2 pins
+    RPB7Rbits.RPB7R = 0b0101; // OC1 - pin 16 - B7
+    RPB8Rbits.RPB8R = 0b0101; // OC2 - pin 17 - B8
+    
+    T2CONbits.TCKPS = 0b011;    // Timer2 prescaler N=1 (1:8)
+	PR2 = 5999;                 // period = (PR2+1) * N * 1 / 48000000 s = 1 ms
+	TMR2 = 0;                   // initial TMR2 count is 0
+    OC1CONbits.OCTSEL = 0;
+	OC1CONbits.OCM = 0b110;     // PWM mode without fault pin; other OC1CON bits are defaults
+	
+    OC1RS = 6000;               // duty cycle = OC1RS/(PR2+1) = 50%
+	OC1R = 6000;                 // initialize before turning OC1 on; afterward it is read-only
+	OC2CONbits.OCM = 0b110;      // PWM mode without fault pin; other OC2CON bits are defaults
+    OC2CONbits.OCTSEL = 0;
+	OC2RS = 6000;                // duty cycle = OC2RS/(PR2+1) = 50%
+	OC2R = 6000;                 // initialize before turning OC2 on; afterward it is read-only 
+    
+    T2CONbits.ON = 1; // Turn on timer
+    
+	OC1CONbits.ON = 1;       // turn on OC1 
+	OC2CONbits.ON = 1;       // turn on OC2
+    
     _CP0_SET_COUNT(0);
     
     while(1) {
